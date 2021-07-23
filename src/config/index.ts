@@ -29,17 +29,34 @@ interface Config {
     port: number;
 
     // logger
-    morganLogger: boolean;
-    morganBodyLogger: boolean;
-    // delare loggerLevel config property
-    loggerLevel: LogLevel;
+    logger: {
+        morganLogger: boolean;
+        morganBodyLogger: boolean;
+        loggerLevel: LogLevel;
+    };
+
+    // mongo
+    mongo: {
+        url: string;
+        useCreateIndex: boolean;
+        autoIndex: boolean;
+    };
 }
 
 const config: Config = {
     port: parsedEnv.PORT as number,
-    morganLogger: parsedEnv.MORGAN_LOGGER as boolean,
-    morganBodyLogger: parsedEnv.MORGAN_BODY_LOGGER as boolean,
-    loggerLevel: parsedEnv.LOGGER_LEVEL as LogLevel,
+
+    logger: {
+        morganLogger: parsedEnv.MORGAN_LOGGER as boolean,
+        morganBodyLogger: parsedEnv.MORGAN_BODY_LOGGER as boolean,
+        loggerLevel: parsedEnv.LOGGER_LEVEL as LogLevel,
+    },
+
+    mongo: {
+        url: parsedEnv.MONGO_URL as string,
+        useCreateIndex: parsedEnv.MONGO_CREATE_INDEX as boolean,
+        autoIndex: parsedEnv.MONGO_AUTO_INDEX as boolean,
+    },
 };
 
 export default config;

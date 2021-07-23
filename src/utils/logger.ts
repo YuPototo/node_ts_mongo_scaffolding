@@ -23,8 +23,11 @@ const prettyJson = winston.format.printf((info) => {
 });
 
 const logger = winston.createLogger({
-    level: config.loggerLevel === "silent" ? undefined : config.loggerLevel,
-    silent: config.loggerLevel === "silent",
+    level:
+        config.logger.loggerLevel === "silent"
+            ? undefined
+            : config.logger.loggerLevel,
+    silent: config.logger.loggerLevel === "silent",
     format: winston.format.combine(
         winston.format.colorize(),
         winston.format.prettyPrint(),

@@ -8,13 +8,13 @@ import config from "@jp/config";
 import logger from "@jp/utils/logger";
 
 const setLogger = (app: Express) => {
-    if (config.morganLogger) {
+    if (config.logger.morganLogger) {
         const loggerFormat =
             ":method :url :status :response-time ms - :res[content-length]";
         app.use(morgan(loggerFormat));
     }
 
-    if (config.morganBodyLogger) {
+    if (config.logger.morganBodyLogger) {
         morganBody(app);
     }
 };
