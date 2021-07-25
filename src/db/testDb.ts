@@ -3,21 +3,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 
 import config from "@jp/config";
 import logger from "@jp/utils/logger";
-
-mongoose.set("debug", process.env.DEBUG !== undefined);
-
-const opts = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: config.mongo.useCreateIndex,
-    keepAlive: true,
-    keepAliveInitialDelay: 300000,
-    autoIndex: config.mongo.autoIndex,
-    serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-    socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-};
-
-// 这是一个 singleton
+import { dbOption } from "./dbOption";
 
 class MongoConnection {
     private static _instance: MongoConnection;
@@ -33,15 +19,10 @@ class MongoConnection {
 
     public async open(): Promise<void> {
         try {
-            if (config.mongo.url === "inmemory") {
-                logger.debug("connecting to inmemory mongo db");
-                this._mongoServer = new MongoMemoryServer();
-                const mongoUrl = await this._mongoServer.getUri();
-                await mongoose.connect(mongoUrl, opts);
-            } else {
-                logger.debug("connecting to mongo db: " + config.mongo.url);
-                mongoose.connect(config.mongo.url, opts);
-            }
+            logger.debug("connecting to inmemory mongo db");
+            this._mongoServer = await MongoMemoryServer.create();
+            const mongoUrl = this._mongoServer.getUri();
+            await mongoose.connect(mongoUrl, dbOption);
 
             mongoose.connection.on("connected", () => {
                 logger.info("Mongo: connected");
@@ -56,7 +37,7 @@ class MongoConnection {
                 if (err.name === "MongoNetworkError") {
                     setTimeout(function () {
                         mongoose
-                            .connect(config.mongo.url, opts)
+                            .connect(config.mongo.url, dbOption)
                             .catch(() => {});
                     }, 5000);
                 }
@@ -70,9 +51,7 @@ class MongoConnection {
     public async close(): Promise<void> {
         try {
             await mongoose.disconnect();
-            if (config.mongo.url === "inmemory") {
-                await this._mongoServer!.stop();
-            }
+            await this._mongoServer!.stop();
         } catch (err) {
             logger.error(`db.open: ${err}`);
             throw err;

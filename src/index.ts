@@ -1,5 +1,5 @@
 import { createApp } from "@jp/app";
-import db from "@jp/utils/db";
+import db from "@jp/db/singleton";
 import config from "@jp/config";
 import logger from "@jp/utils/logger";
 
